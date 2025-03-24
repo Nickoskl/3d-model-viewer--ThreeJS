@@ -6,6 +6,10 @@
   <title>Document</title>
 </head>
 <body>
+  <a href="https://github.com/Nickoskl/3d-model-viewer--ThreeJS" class="githubLink">
+    <i class="pi pi-github"></i>
+    <h6>View on github</h6>
+  </a>
   <div id="loader">
     <div id="loaderMsgs">
       <h1 id="loadingmain">LOADING SCENE</h1>
@@ -30,6 +34,32 @@
 
   canvas{
     transition: all 0.5s;
+  }
+
+  .githubLink{
+    pointer-events: all;
+    position:absolute;
+    bottom: 0;
+    left:0;
+    z-index: 2;
+    background-color:#202020 ;
+    color:#888888;
+    font-size:20px;
+    padding: 1% 2%;
+  }
+
+  .githubLink h6{
+    margin: 0;
+    display: inline-block;
+    vertical-align: middle;
+  }
+
+  .githubLink i{
+    display: inline-block;
+    margin: 0;
+    font-size: 20px;
+    padding-right: 10px;
+    vertical-align: middle;
   }
 
   #loader{
