@@ -1,6 +1,6 @@
 <h1 align="center" id="title">💡 3D Model Viewer - ThreeJS</h1>
 
-<p id="description">This is a proof of consept for converting Maya exports to threejs. There will be a physically accurate version of this with the implementation of pathtracing <a href="https://github.com/gkjohnson/three-gpu-pathtracer">from here</a></p>
+<p id="description">This is a proof of concept for converting Maya exports to threejs. There will be a physically accurate version of this with the implementation of pathtracing <a href="https://github.com/gkjohnson/three-gpu-pathtracer">from here</a></p>
 
 <h2 align="center">🚀 Demo</h2>
 
