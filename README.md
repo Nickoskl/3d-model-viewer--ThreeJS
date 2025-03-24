@@ -11,8 +11,9 @@
 
 
 *   I used PBR materials. Some from Polliigon and some custom textures
+*   I made a basic loader
 *   This is propably going to get updated testing animations,lights and more..
-*   <s>Runs well even on mobile</s> Not yet
+*   <s>Runs well even on mobile</s> Propably not yet
 
 
 <h2>💖Like my work?</h2>

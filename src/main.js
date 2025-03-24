@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { colorSpaceToWorking } from 'three/tsl';
-import { GLTFLoader, FBXLoader } from 'three/examples/jsm/Addons.js';
+import { GLTFLoader, FBXLoader, OBJLoader } from 'three/examples/jsm/Addons.js';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 import { Reflector } from 'three/addons/objects/Reflector.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -11,12 +11,15 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
 
-// import { UnrealBloomPass } from 'https://threejs.org/examples/jsm/postprocessing/UnrealBloomPass.js';
-
+const loadermsg = document.getElementById('loadermsg')
+const loadermain = document.getElementById('loadingmain')
+loadermsg.innerHTML='Started Loading Scene'
+document.getElementById('loaderMsgs').style.transform ='translate(-75%,-50%)'
 
 let stats,gui;
 
 const state = {
+  loadedAssets:0,
   can:{
     middle:{
       metalness:0.35,
@@ -28,8 +31,11 @@ const state = {
       metalness:0.5,
       ior:0.9,
       roughness:0.2,
-      normalScale:2,
+      normalScale:0.5,
     }
+  },
+  floor:{
+    visible:true
   },
   ice:{
     color:0xffffff,
@@ -77,6 +83,7 @@ stats = new Stats();
 
 
 const textureLoader = new THREE.TextureLoader();
+const textureLoader2 = new THREE.ImageBitmapLoader();
 
 gui = new GUI();
 				const canFolder = gui.addFolder( 'Can' );
@@ -162,7 +169,7 @@ gui = new GUI();
 
 
 const rgbeLoader = new RGBELoader();
-rgbeLoader.load('/pbr/blocky_photo_studio_1k.hdr', (texture) => {
+rgbeLoader.load('/pbr/blocky_photo_studio_1k.hdr',  async (texture) => {
   texture.mapping = THREE.EquirectangularReflectionMapping;
   // scene.background = texture;
   scene.environment = texture;
@@ -215,6 +222,9 @@ envFolder.add( state.hdr, 'visible').onChange( function () {
     }
 
   } );
+
+  loadermsg.innerHTML='Imported HDR Enviroment'
+  state.loadedAssets++
 
 });
 
@@ -284,25 +294,14 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
   console.log(gltf)
   gltf_val= gltf
 
-
     const textures = new Set();
 
 
     gltf.traverse((node) => {
       if (node.isMesh) {
         const material = node.material;
-        if (material.map) textures.add(material.map);
-        if (material.aoMap) textures.add(material.aoMap);
-        if (material.normalMap) textures.add(material.normalMap);
-        if (material.bumpMap) textures.add(material.bumpMap);
-        if (material.roughnessMap) textures.add(material.roughnessMap);
-        if (material.metalnessMap) textures.add(material.metalnessMap);
-        if (material.displacementMap) textures.add(material.displacementMap);
-        if (material.emissiveMap) textures.add(material.emissiveMap);
-        node.castShadow=true;
-        node.receiveShadow=true;
         console.log(material)
-
+        loadermain.innerHTML='LOADING TEXTURES';
         // const colorMap = textureLoader.load('/pbr/icecuvetest.png')
         const colorMap = textureLoader.load('/pbr/ice_color.png')
         const roughnessMap = textureLoader.load('/pbr/ice_roughness3.png', (texture) => {
@@ -312,11 +311,14 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.repeat.set(0.7, 0.8);
         
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+            loadermsg.innerHTML='Imported Ice (roughness)'
+            state.loadedAssets++
         });
         const specularMap = textureLoader.load('/pbr/ice_specular.png', (texture) => {
           texture.encoding = THREE.LinearEncoding;
           // texture.format = THREE.AlphaFormat ;
           texture.type = THREE.FloatType;
+          
         });
         const specularInvMap = textureLoader.load('/pbr/ice_specular_inv.png', (texture) => {
           texture.encoding = THREE.LinearEncoding;
@@ -340,6 +342,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.encoding = THREE.LinearEncoding;
           // texture.format = THREE.AlphaFormat ;
           texture.type = THREE.FloatType;
+          loadermsg.innerHTML='Imported Ice (bump)'
+          state.loadedAssets++
         });
         // specularInvMap.colorSpace = THREE.SRGBColorSpace
 
@@ -408,13 +412,15 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
         node.material = gltf_mat
       }
 
-
-        const can_colorMap = textureLoader.load('/pbr/can_color.png', (texture) => {
+      const can_colorMap = textureLoader.load('/pbr/can_color.png', (texture) => {
           texture.repeat.set(0.7, 0.8);
-        
+          
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         
           texture.offset.set(1.36, 0.4); 
+
+          loadermsg.innerHTML='Imported Can Texture (color)';
+          state.loadedAssets++
         });
 
         
@@ -424,6 +430,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
           texture.rotation=Math.PI / 2;
           texture.offset.set(1.37, 0.4); 
+          loadermsg.innerHTML='Imported Can Texture (normals)';
+          state.loadedAssets++
         });
 
         const can_Metalness = textureLoader.load('/pbr/can_metalness.jpg', (texture) => {
@@ -433,6 +441,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         
           texture.offset.set(1.37, 0.4);
+          loadermsg.innerHTML='Imported Can Texture (metalness)';
+          state.loadedAssets++
         });
         
 
@@ -445,6 +455,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
         
           texture.offset.set(1.37, 0.4);
+          loadermsg.innerHTML='Imported Can Texture (specular)';
+          state.loadedAssets++
         });
 
         
@@ -462,6 +474,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
             specularColorMap:can_Specular,
             specularIntensityMap:can_Specular,
           });
+
+
 
 
           MiddleFolder.add(state.can.middle, 'metalness', 0.01, 1, 0.01).onChange(function (value) {
@@ -494,6 +508,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           texture.rotation= Math.PI /2
 
           texture.offset.set(1.37, 0.4); 
+          loadermsg.innerHTML='Imported Can Metal (color)';
+          state.loadedAssets++
         });
 
 
@@ -521,7 +537,6 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
 
           node.material = gltf_mat3
         }
-
 
 
       }
@@ -619,7 +634,18 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
 
   floorMirror.position.y = -10.8;
   floorMirror.rotation.x= - Math.PI /2;
-  scene.add( floorMirror );
+  if(state.floor.visible){
+    scene.add( floorMirror );
+  }
+
+  floorFolder.add(state.floor,'visible').onChange(()=>{
+    if(state.floor.visible){
+      scene.add( floorMirror );
+    }else{
+      scene.remove(floorMirror);
+    }
+  })
+
 
 
 
@@ -630,6 +656,10 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
   camera.fov = gltf_val.children[2].children[0].fov; 
   camera.updateProjectionMatrix();
   scene.add(camera);
+
+  loadermsg.innerHTML='Imported FBX Model';
+  document.getElementById('loader').style.backgroundColor='#00000056';
+  state.loadedAssets++;
 
 });
 
@@ -746,7 +776,7 @@ DepthOfFieldFolder.add( state.post.dof, 'enable').onChange( function () {
   }
 
 } );
-
+let gpuBusy = false;
 
 const controls = new OrbitControls(camera,canvas);
 // controls.enableDamping=true;
@@ -768,6 +798,11 @@ const loop = () => {
   composer.render();
   stats.update();
   window.requestAnimationFrame(loop);
+  console.log(state.loadedAssets);
+  if(state.loadedAssets==44){
+    setTimeout(()=>{ loadermain.innerHTML='';document.getElementById('loaderMsgs').style.padding='2% 0';document.getElementById('updContainer').innerHTML='<i class="pi pi-check"></i><p id="loadermsg">Done</p>'},1000);
+    setTimeout(()=>{document.getElementById('loader').style.backdropFilter='blur(0)';document.getElementById('loader').style.backgroundColor='#00000000';document.getElementById('loaderMsgs').style.opacity=0;},1500);
+  }
 };
 
 loop();
