@@ -4,7 +4,7 @@
 
 <h2 align="center">🚀 Demo</h2>
 
-<p align="center"><a href="https://urltobeupdated">https://urltobeupdated</a></p>
+<p align="center"><a href="https://deploy1.nikosvw.com">https://deploy1.nikosvw.com</a></p>
 
 
 <h2>🧐 About</h2>
