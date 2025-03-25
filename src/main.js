@@ -919,7 +919,7 @@ const loop = async () => {
   }
   
   console.log(state.loadedAssets);
-  if(!addedHeavyMatts&&state.loadedAssets>=38){
+  if(state.loadedAssets>=38){
     // if(true){
     if(!addedEL){
       addEventListeners();
