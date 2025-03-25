@@ -323,7 +323,8 @@ var gltf_mat='';
 var gltf_mat2='';
 var gltf_mat3='';
 var topbottomadded=false;
-const addedMaterials = new Set(); 
+const addedMaterialsMiddle = new Set(); 
+const addedMaterialsTopBottom = new Set(); 
 const addedMaterialsNormalMap = new Set(); 
 
 let floorMirror;
@@ -524,6 +525,9 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           if (!addedMaterialsNormalMap.has(gltf_mat2)) {
             addedMaterialsNormalMap.add(gltf_mat2);
           }
+          if (!addedMaterialsMiddle.has(gltf_mat2)) {
+            addedMaterialsMiddle.add(gltf_mat2);
+        }
 
 
           node.material = gltf_mat2
@@ -556,8 +560,8 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
 
 
 
-          if (!addedMaterials.has(gltf_mat3)) {
-          addedMaterials.add(gltf_mat3);
+          if (!addedMaterialsTopBottom.has(gltf_mat3)) {
+            addedMaterialsTopBottom.add(gltf_mat3);
         }
         if (!addedMaterialsNormalMap.has(gltf_mat3)) {
           addedMaterialsNormalMap.add(gltf_mat3);
@@ -695,19 +699,19 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
 
 
 TopBottomFolder.add(state.can.topbottom, 'metalness', 0.01, 1, 0.01).onChange(function (value) {
-  addedMaterials.forEach(material => {
+  addedMaterialsMiddle.forEach(material => {
     material.metalness = state.can.topbottom.metalness;
   });
 });
 
 TopBottomFolder.add(state.can.topbottom, 'ior', 0.1, 2.3, 0.1).onChange(function (value) {
-  addedMaterials.forEach(material => {
+  addedMaterialsMiddle.forEach(material => {
     material.ior = state.can.topbottom.ior;
   });
 });
 
 TopBottomFolder.add(state.can.topbottom, 'roughness', 0.01, 1, 0.01).onChange(function (value) {
-  addedMaterials.forEach(material => {
+  addedMaterialsMiddle.forEach(material => {
     material.roughness = state.can.topbottom.roughness;
   });
 });
@@ -832,20 +836,24 @@ const addHeavyMaterials= async()=>{
 
     material.normalMap = can_normals;
     material.normalScale=new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
-    
-    MiddleFolder.add(state.can.middle, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
-      gltf_mat2.normalScale = new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
-    });
 
-    TopBottomFolder.add(state.can.topbottom, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
-      addedMaterials.forEach(material => {
-        material.normalScale = new THREE.Vector2(state.can.topbottom.normalScale, state.can.topbottom.normalScale);
-      });
-    });
+
+    
 
     // normalMap:can_normals,
     //         normalScale:new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale ),
     console.log("LOADED HEAVE MATTERIALS")
+  });
+      
+  MiddleFolder.add(state.can.middle, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
+    addedMaterialsMiddle.forEach(material => {
+      material.normalScale = new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
+    });
+  });
+  TopBottomFolder.add(state.can.topbottom, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
+    addedMaterialsTopBottom.forEach(material => {
+      material.normalScale = new THREE.Vector2(state.can.topbottom.normalScale, state.can.topbottom.normalScale);
+    });
   });
 }
 
