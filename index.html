@@ -10,6 +10,9 @@
     <i class="pi pi-github"></i>
     <h6>View on github</h6>
   </a>
+  <div id="specsUpd">
+    <h5 id="specsUpdText"></h5>
+  </div>
   <div id="loader">
     <div id="loaderMsgs">
       <h1 id="loadingmain">LOADING SCENE</h1>
@@ -24,6 +27,29 @@
 </body>
 <style>
 @import "primeicons/primeicons.css";
+
+#specsUpd{
+  position: absolute;
+  top:90%;
+  left:50%;
+  transform: translate(-50%,-50%);
+  background-color: #202020;
+  color:#888888;
+  width:30%;
+  text-align: center;
+  border-radius: 5px;
+  transition: all 1.5s;
+}
+
+#specsUpd h5{
+  margin:0;
+  padding: 3% 5%;
+}
+
+#specsUpd i{
+  padding:1%;
+}
+
   .webgl{
     display: block;
   }
@@ -45,7 +71,8 @@
     background-color:#202020 ;
     color:#888888;
     font-size:20px;
-    padding: 1% 2%;
+    border-radius: 0 5px 0 0;
+    padding: 10px 20px;
   }
 
   .githubLink h6{
@@ -68,7 +95,6 @@
     position: absolute;
     height:100dvh;
     width: 100dvw;
-    transition: all 1s;
     opacity: 1;
     pointer-events: none;
     transition: all 1.5s;
@@ -92,6 +118,8 @@
     /* padding-top:15%; */
   }
 
+
+
   #loader i{
     font-size: 20px;
     padding: 0 3%;
@@ -114,5 +142,26 @@
     opacity: 1;
     transition: all 0.5s;
   }
+
+  @media screen and (max-width: 500px) {
+  .lil-gui.autoPlace {
+    width: 95dvw;
+    max-height: 100%;
+    position: fixed;
+    right: 50%;
+    transform: translateX(50%);
+    top: 0;
+    z-index: 1001;
+    opacity: 0.6;
+    transition: all 0.5s ease-in-out;
+  }
+  #loaderMsgs{
+    width:90dvw;
+  }
+  #specsUpd{
+    top:80%;
+    width:80dvw;
+  }
+}
 </style>
 </html>

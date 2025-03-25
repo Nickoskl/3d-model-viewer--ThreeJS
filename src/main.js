@@ -10,11 +10,20 @@ import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+let frames = 0, prevTime = performance.now();
+
+var addedHeavyMatts=false;
 
 const loadermsg = document.getElementById('loadermsg')
 const loadermain = document.getElementById('loadingmain')
 loadermsg.innerHTML='Started Loading Scene'
-document.getElementById('loaderMsgs').style.transform ='translate(-75%,-50%)'
+
+
+if(screen.width<500){
+}else{
+  document.getElementById('loaderMsgs').style.transform ='translate(-75%,-50%)'
+}
+
 
 let stats,gui;
 
@@ -79,31 +88,62 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff); // Replace 0x87CEEB with your desired color
 
 stats = new Stats();
-				document.body.appendChild( stats.dom );
+if(screen.width<500){
+  stats.dom.style='position: fixed;bottom: 0px;right: 0px;cursor: pointer;opacity: 0.9;z-index: 10000;'
+}
+document.body.appendChild( stats.dom );
+
+
 
 
 const textureLoader = new THREE.TextureLoader();
-const textureLoader2 = new THREE.ImageBitmapLoader();
+const textureLoader2 = new THREE.ImageBitmapLoader();//TODO
+
+
 
 gui = new GUI();
 				const canFolder = gui.addFolder( 'Can' );
-				canFolder.open();
+
+        if(screen.width<500){
+          canFolder.close();
+        }else{
+          canFolder.open();
+        }
+
           const TopBottomFolder = canFolder.addFolder('Top/Bottom - Brushed Metal')
           TopBottomFolder.open();
           const MiddleFolder = canFolder.addFolder('Middle - Color/Logo')
           MiddleFolder.open();
         const iceFolder = gui.addFolder( 'Ice' );
-				iceFolder.open();
+        if(screen.width<500){
+          iceFolder.close();
+        }else{
+          iceFolder.open();
+        }
         const floorFolder = gui.addFolder( 'Floor' );
-				floorFolder.open();
+        if(screen.width<500){
+          floorFolder.close();
+        }else{
+          floorFolder.open();
+        }
         const envFolder = gui.addFolder( 'Enviroment' );
-				envFolder.open();
+        if(screen.width<500){
+          envFolder.close();
+        }else{
+          envFolder.open();
+        }
 				const POSTFolder = gui.addFolder( 'Post Processing' );
-				POSTFolder.open();
+        if(screen.width<500){
+          POSTFolder.close();
+        }else{
+          POSTFolder.open();
+        }
           const BloomFolder = POSTFolder.addFolder( 'Bloom' );
           BloomFolder.open();
           const DepthOfFieldFolder = POSTFolder.addFolder( 'Depth Of Field' );
           DepthOfFieldFolder.open();
+
+
 
 
 
@@ -284,6 +324,7 @@ var gltf_mat2='';
 var gltf_mat3='';
 var topbottomadded=false;
 const addedMaterials = new Set(); 
+const addedMaterialsNormalMap = new Set(); 
 
 let floorMirror;
 
@@ -424,15 +465,7 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
         });
 
         
-        const can_normals = textureLoader.load('/pbr/can_normals.png', (texture) => {
-          texture.repeat.set(0.7, 0.8);
-        
-          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-          texture.rotation=Math.PI / 2;
-          texture.offset.set(1.37, 0.4); 
-          loadermsg.innerHTML='Imported Can Texture (normals)';
-          state.loadedAssets++
-        });
+
 
         const can_Metalness = textureLoader.load('/pbr/can_metalness.jpg', (texture) => {
 
@@ -469,8 +502,6 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
             metalness:state.can.middle.metalness,
             ior:state.can.middle.ior,
             roughness:state.can.middle.roughness,
-            normalMap:can_normals,
-            normalScale:new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale ),
             specularColorMap:can_Specular,
             specularIntensityMap:can_Specular,
           });
@@ -489,12 +520,10 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           MiddleFolder.add(state.can.middle, 'roughness', 0.01, 1, 0.01).onChange(function (value) {
             gltf_mat2.roughness = value;
           });
-  
-          MiddleFolder.add(state.can.middle, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
-            gltf_mat2.normalScale = new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
-          });
-  
 
+          if (!addedMaterialsNormalMap.has(gltf_mat2)) {
+            addedMaterialsNormalMap.add(gltf_mat2);
+          }
 
 
           node.material = gltf_mat2
@@ -523,8 +552,6 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
             metalness:state.can.topbottom.roughness,
             ior:state.can.topbottom.roughness,
             roughness:state.can.topbottom.roughness,
-            normalMap:can_normals,
-            normalScale:new THREE.Vector2( state.can.topbottom.normalScale, state.can.topbottom.normalScale ),
           });
 
 
@@ -532,7 +559,9 @@ mesh.load('/webexpfbx2.fbx', async function (gltf) {
           if (!addedMaterials.has(gltf_mat3)) {
           addedMaterials.add(gltf_mat3);
         }
-
+        if (!addedMaterialsNormalMap.has(gltf_mat3)) {
+          addedMaterialsNormalMap.add(gltf_mat3);
+        }
 
 
           node.material = gltf_mat3
@@ -683,11 +712,6 @@ TopBottomFolder.add(state.can.topbottom, 'roughness', 0.01, 1, 0.01).onChange(fu
   });
 });
 
-TopBottomFolder.add(state.can.topbottom, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
-  addedMaterials.forEach(material => {
-    material.normalScale = new THREE.Vector2(state.can.topbottom.normalScale, state.can.topbottom.normalScale);
-  });
-});
 
 
 
@@ -776,8 +800,6 @@ DepthOfFieldFolder.add( state.post.dof, 'enable').onChange( function () {
   }
 
 } );
-let gpuBusy = false;
-
 const controls = new OrbitControls(camera,canvas);
 // controls.enableDamping=true;
 // controls.enablePan=false;
@@ -793,17 +815,115 @@ window.addEventListener("resize", () => {
   composer.setSize(sizes.width, sizes.height);
 });
 
-const loop = () => {
+var addedEL=false;
+
+const addHeavyMaterials= async()=>{
+  addedMaterialsNormalMap.forEach(material => {
+    const can_normals = textureLoader.load('/pbr/can_normals.png', (texture) => {
+      texture.repeat.set(0.7, 0.8);
+    
+      texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+      texture.rotation=Math.PI / 2;
+      texture.offset.set(1.37, 0.4); 
+      // loadermsg.innerHTML='Imported Can Texture (normals)';
+      state.loadedAssets++
+    });
+
+
+    material.normalMap = can_normals;
+    material.normalScale=new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
+    
+    MiddleFolder.add(state.can.middle, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
+      gltf_mat2.normalScale = new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale )
+    });
+
+    TopBottomFolder.add(state.can.topbottom, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
+      addedMaterials.forEach(material => {
+        material.normalScale = new THREE.Vector2(state.can.topbottom.normalScale, state.can.topbottom.normalScale);
+      });
+    });
+
+    // normalMap:can_normals,
+    //         normalScale:new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale ),
+    console.log("LOADED HEAVE MATTERIALS")
+  });
+}
+
+const addEventListeners=()=>{
+  const sliderElm = document.getElementsByClassName('controller');
+  const colorElm = document.querySelectorAll('input[type=color]');
+  const cont = document.getElementsByClassName('lil-gui');
+    // console.log(elm)
+    Array.from(sliderElm).forEach(indElm=>{
+
+      indElm.addEventListener("touchstart",function(){
+        cont[0].style.opacity='0.1'
+      })
+  
+      indElm.addEventListener("touchend",function(){
+        cont[0].style.opacity='0.6'
+      })
+
+    })
+
+    Array.from(colorElm).forEach(indElm=>{
+
+      indElm.addEventListener("input",function(){
+        cont[0].style.opacity='0.1'
+      })
+  
+      indElm.addEventListener("touchend",function(){
+        cont[0].style.opacity='0.6'
+      })
+
+    })
+
+    console.log(stats)
+}
+
+const loop = async () => {
   controls.update();
   composer.render();
   stats.update();
   window.requestAnimationFrame(loop);
+
+  frames ++;
+  const time = performance.now();
+  
+  if ( time >= prevTime + 1000 ) {
+  
+    console.log( Math.round( ( frames * 1000 ) / ( time - prevTime ) ) );
+
+    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))>19&& !addedHeavyMatts){
+      await addHeavyMaterials()
+      document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Capable. Added Heavy Materials'
+      document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-check" style="font-size: 2rem"></i>'
+      addedHeavyMatts=true;
+    }
+    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))<=19&& !addedHeavyMatts){
+      document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Not Capable. Added Light Materials'
+      document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-exclamation-circle" style="font-size: 2rem"></i>'
+    }
+    
+    frames = 0;
+    prevTime = time;
+    
+  }
+  
   console.log(state.loadedAssets);
-  if(state.loadedAssets==44){
+  if((addedHeavyMatts&&state.loadedAssets==42)||(!addedHeavyMatts&&state.loadedAssets==38)){
+    // if(true){
+    if(!addedEL){
+      addEventListeners();
+      addedEL=true;
+    }
+    setTimeout(()=>{document.getElementById('specsUpd').style.opacity=0},8000)
     setTimeout(()=>{ loadermain.innerHTML='';document.getElementById('loaderMsgs').style.padding='2% 0';document.getElementById('updContainer').innerHTML='<i class="pi pi-check"></i><p id="loadermsg">Done</p>'},1000);
     setTimeout(()=>{document.getElementById('loader').style.backdropFilter='blur(0)';document.getElementById('loader').style.backgroundColor='#00000000';document.getElementById('loaderMsgs').style.opacity=0;},1500);
   }
 };
+
+
 
 loop();
 

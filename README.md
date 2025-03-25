@@ -12,6 +12,7 @@
 
 *   I used PBR materials. Some from Polliigon and some custom textures
 *   I made a basic loader
+*   I made a basic device assessment process and added heavy materials only if device is capable
 *   This is propably going to get updated testing animations,lights and more..
 *   <s>Runs well even on mobile</s> Propably not yet
 
