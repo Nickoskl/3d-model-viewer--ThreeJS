@@ -902,13 +902,13 @@ const loop = async () => {
   
     console.log( Math.round( ( frames * 1000 ) / ( time - prevTime ) ) );
 
-    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))>19&& !addedHeavyMatts){
+    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))>19&& !addedHeavyMatts&& state.loadedAssets>=38){
       await addHeavyMaterials()
       document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Capable. Added Heavy Materials'
       document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-check" style="font-size: 2rem"></i>'
       addedHeavyMatts=true;
     }
-    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))<=19&& !addedHeavyMatts){
+    if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))<=19&& !addedHeavyMatts&& state.loadedAssets>=38){
       document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Not Capable. Added Light Materials'
       document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-exclamation-circle" style="font-size: 2rem"></i>'
     }
