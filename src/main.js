@@ -831,6 +831,9 @@ const addHeavyMaterials= async()=>{
       texture.offset.set(1.37, 0.4); 
       // loadermsg.innerHTML='Imported Can Texture (normals)';
       state.loadedAssets++
+      document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Capable. Added Can Texture (metalness)'
+      document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-check" style="font-size: 2rem"></i>'
+      setTimeout(()=>{document.getElementById('specsUpd').style.opacity=0},8000)
     });
 
 
@@ -842,7 +845,7 @@ const addHeavyMaterials= async()=>{
 
     // normalMap:can_normals,
     //         normalScale:new THREE.Vector2( state.can.middle.normalScale, state.can.middle.normalScale ),
-    console.log("LOADED HEAVE MATTERIALS")
+    console.log("LOADED HEAVY MATTERIALS")
   });
       
   MiddleFolder.add(state.can.middle, 'normalScale', 0.01, 10, 0.01).onChange(function (value) {
@@ -904,8 +907,8 @@ const loop = async () => {
 
     if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))>19&& !addedHeavyMatts&& state.loadedAssets>=38){
       await addHeavyMaterials()
-      document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Capable. Added Heavy Materials'
-      document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-check" style="font-size: 2rem"></i>'
+      document.getElementById('specsUpdText').innerHTML='Your Device Hardware is Capable. Adding Heavy Materials'
+      document.getElementById('specsUpdText').innerHTML=document.getElementById('specsUpdText').innerHTML+'<br><i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>'
       addedHeavyMatts=true;
     }
     if((Math.round( ( frames * 1000 ) / ( time - prevTime ) ))<=19&& !addedHeavyMatts&& state.loadedAssets>=38){
@@ -925,7 +928,6 @@ const loop = async () => {
       addEventListeners();
       addedEL=true;
     }
-    setTimeout(()=>{document.getElementById('specsUpd').style.opacity=0},8000)
     setTimeout(()=>{ loadermain.innerHTML='';document.getElementById('loaderMsgs').style.padding='2% 0';document.getElementById('updContainer').innerHTML='<i class="pi pi-check"></i><p id="loadermsg">Done</p>'},1000);
     setTimeout(()=>{document.getElementById('loader').style.backdropFilter='blur(0)';document.getElementById('loader').style.backgroundColor='#00000000';document.getElementById('loaderMsgs').style.opacity=0;},1500);
   }
